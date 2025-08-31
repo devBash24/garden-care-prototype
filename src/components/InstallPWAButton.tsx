@@ -18,9 +18,12 @@ function isStandalone(): boolean {
 export default function InstallPWAButton() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [installed, setInstalled] = useState<boolean>(false)
+  const [showIosHelp, setShowIosHelp] = useState<boolean>(false)
+  const [isIos, setIsIos] = useState<boolean>(false)
 
   useEffect(() => {
     setInstalled(isStandalone())
+    setIsIos(/iphone|ipad|ipod/i.test(window.navigator.userAgent))
 
     const onBeforeInstallPrompt = (e: Event) => {
       e.preventDefault()
@@ -42,6 +45,7 @@ export default function InstallPWAButton() {
   }, [])
 
   const canInstall = useMemo(() => !!deferredPrompt && !installed, [deferredPrompt, installed])
+  const showIosInstall = useMemo(() => isIos && !installed && !deferredPrompt, [isIos, installed, deferredPrompt])
 
   const handleInstall = async () => {
     if (!deferredPrompt) return
@@ -54,25 +58,43 @@ export default function InstallPWAButton() {
     }
   }
 
-  if (!canInstall) return null
+  if (!canInstall && !showIosInstall) return null
 
   return (
-    <button
-      onClick={handleInstall}
-      style={{
-        padding: '0.6rem 1rem',
-        borderRadius: 8,
-        border: '1px solid #10B981',
-        background: '#10B981',
-        color: 'white',
-        cursor: 'pointer',
-        fontWeight: 600,
-        marginTop: 12,
-      }}
-      aria-label="Install app"
-    >
-      Install App
-    </button>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
+      {canInstall && (
+        <button
+          onClick={handleInstall}
+          style={{
+            padding: '0.6rem 1rem',
+            borderRadius: 8,
+            border: '1px solid #10B981',
+            background: '#10B981',
+            color: 'white',
+            cursor: 'pointer',
+            fontWeight: 600,
+          }}
+          aria-label="Install app"
+        >
+          Install App
+        </button>
+      )}
+      {showIosInstall && (
+        <div
+          style={{
+            padding: '0.6rem 0.8rem',
+            borderRadius: 8,
+            border: '1px solid #ddd',
+            background: '#fff',
+            color: '#111',
+          }}
+        >
+          <div style={{ fontWeight: 600, marginBottom: 6 }}>Install on iPhone/iPad</div>
+          <div style={{ fontSize: 14, lineHeight: 1.4 }}>
+            Open in Safari, tap the Share icon, then “Add to Home Screen”.
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
-
