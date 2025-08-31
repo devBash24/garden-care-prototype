@@ -18,7 +18,6 @@ function isStandalone(): boolean {
 export default function InstallPWAButton() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [installed, setInstalled] = useState<boolean>(false)
-  const [showIosHelp, setShowIosHelp] = useState<boolean>(false)
   const [isIos, setIsIos] = useState<boolean>(false)
 
   useEffect(() => {
